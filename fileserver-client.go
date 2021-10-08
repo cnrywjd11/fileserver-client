@@ -32,7 +32,7 @@ func main() {
 	}
 	runtime.GOMAXPROCS(threadCounts)
 
-	src, dst = modifyPath(host, src, dst)
+	host, src, dst = modifyPath(host, src, dst)
 	if err := os.MkdirAll(filepath.Dir(dst), 0755); err != nil {
 		if !errors.Is(err, fs.ErrExist) {
 			log.Fatal(err)
@@ -52,10 +52,12 @@ func main() {
 	}
 }
 
-func modifyPath(host, src, dst string) (string, string) {
+func modifyPath(host, src, dst string) (string, string, string) {
+	host = strings.TrimPrefix(host, "http://")
+
 	if strings.HasSuffix(src, "/") &&
 		strings.HasSuffix(dst, "/") {
-		return src, dst
+		return host, src, dst
 	}
 
 	src = strings.TrimSuffix(src, "/")
@@ -77,7 +79,7 @@ func modifyPath(host, src, dst string) (string, string) {
 		dst += "/"
 	}
 
-	return src, dst
+	return host, src, dst
 }
 
 func checkFileCount(host, src string) int {
